@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Memória - Princesa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .game-container {
+            background: #f8c3d7;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #d15a8f;
+        }
+
+        .memory-game {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 10px;
+            margin: 20px 0;
+        }
+
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color: #ffccff;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            display: none;
+            border-radius: 5px;
+        }
+
+        .card.flipped img {
+            display: block;
+        }
+
+        .card.matched {
+            background-color: #d1f7d6;
+            pointer-events: none;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #d15a8f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e06d96;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Jogo da Memória - Princesa</h1>
+        <div class="memory-game">
+            <!-- Cartas do jogo serão inseridas aqui pelo JavaScript -->
+        </div>
+        <button class="reset">Reiniciar Jogo</button>
+    </div>
+
+    <script>
+        const cardsArray = [
+            'princess1', 'princess1',
+            'princess2', 'princess2',
+            'princess3', 'princess3',
+            'princess4', 'princess4',
+            'princess5', 'princess5',
+            'princess6', 'princess6',
+            'princess7', 'princess7',
+            'princess8', 'princess8'
+        ];
+
+        const gameContainer = document.querySelector('.memory-game');
+        const resetButton = document.querySelector('.reset');
+        let flippedCards = [];
+        let matchedCards = [];
+
+        // Embaralhar as cartas
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        // Criar o jogo com as cartas
+        function createGame() {
+            shuffle(cardsArray);
+            gameContainer.innerHTML = ''; // Limpa o jogo anterior
+            cardsArray.forEach(card => {
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('card');
+                cardElement.dataset.card = card;
+
+                const cardImage = document.createElement('img');
+                cardImage.src = `princesas/${card}.jpg`; // Substitua com suas imagens de princesas
+                cardElement.appendChild(cardImage);
+
+                gameContainer.appendChild(cardElement);
+
+                // Adiciona evento de clique
+                cardElement.addEventListener('click', flipCard);
+            });
+        }
+
+        // Virar a carta
+        function flipCard() {
+            if (flippedCards.length === 2 || this.classList.contains('flipped') || this.classList.contains('matched')) {
+                return;
+            }
+
+            this.classList.add('flipped');
+            flippedCards.push(this);
+
+            if (flippedCards.length === 2) {
+                checkMatch();
+            }
+        }
+
+        // Verificar se as cartas viradas são iguais
+        function checkMatch() {
+            const [firstCard, secondCard] = flippedCards;
+
+            if (firstCard.dataset.card === secondCard.dataset.card) {
+                firstCard.classList.add('matched');
+                secondCard.classList.add('matched');
+                matchedCards.push(firstCard, secondCard);
+                flippedCards = [];
+
+                if (matchedCards.length === cardsArray.length) {
+                    alert('Você ganhou amor!');
+                }
+            } else {
+                setTimeout(() => {
+                    firstCard.classList.remove('flipped');
+                    secondCard.classList.remove('flipped');
+                    flippedCards = [];
+                }, 1000);
+            }
+        }
+
+        // Reiniciar o jogo
+        resetButton.addEventListener('click', createGame);
+
+        // Iniciar o jogo
+        createGame();
+    </script>
+</body>
+</html>
+
